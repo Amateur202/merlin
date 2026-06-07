@@ -1,0 +1,33 @@
+# Structs, methods, self, partial and full instantiation
+
+struct NetworkInterface:
+    uint16 io_port
+    uint32 capacity
+    bool   active
+
+    void configure(uint16 port):
+        self.io_port   = port
+        self.active    = true
+        self.capacity  = 1518
+
+    bool is_active():
+        return self.active
+
+    uint16 get_port():
+        return self.io_port
+
+void demo_struct():
+    # Full explicit instantiation
+    NetworkInterface eth0 = NetworkInterface{io_port: 0x300, capacity: 0, active: false}
+
+    # Partial instantiation (unspecified fields default to zero)
+    NetworkInterface eth1 = NetworkInterface{io_port: 0x300}
+
+    eth0.configure(0x300)
+    bool up = eth0.is_active()
+    uint16 port = eth0.get_port()
+
+    if up:
+        print("eth0 active on port ", (int)port, "\n")
+
+demo_struct()

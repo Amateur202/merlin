@@ -1,0 +1,37 @@
+# Control flow -- if/elif/else, for range/cond/infinite, break/continue/pass
+
+void demo_control(int val):
+    # if / elif / else
+    if val < 0:
+        print("negative\n")
+    elif val == 0:
+        print("zero\n")
+    else:
+        print("positive\n")
+
+    # pass (no-op placeholder)
+    if val == 999:
+        pass
+
+    # for range
+    for i in range(0, 10):
+        print(i, " ")
+
+    # for condition (replaces while)
+    int x = 5
+    for x > 0:
+        print("tick\n")
+        x = x - 1
+
+    # for infinite (replaces while true) -- with break
+    for:
+        print("loop\n")
+        break
+
+    # continue
+    for i in range(0, 5):
+        if i == 2:
+            continue
+        print(i, "\n")
+
+demo_control(7)

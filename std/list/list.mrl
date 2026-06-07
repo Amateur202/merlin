@@ -1,0 +1,107 @@
+@import "mem"
+
+template<T>
+struct lists:
+    &T data
+    int count
+    int capacity
+
+    void push(T val):
+        if self.count >= self.capacity:
+            if self.capacity == 0:
+                self.capacity = 4
+            else:
+                self.capacity *= 2
+            self.data = (&T)realloc(self.data, self.capacity * sizeof(self.data[0]))
+        self.data[self.count] = val
+        self.count += 1
+
+    T pop():
+        self.count -= 1
+        return self.data[self.count]
+
+    T get(int idx) throws:
+        if idx < 0 or idx >= self.count:
+            raise 1
+        return self.data[idx]
+
+    T uget(int idx):
+        return self.data[idx]
+
+    void set(int idx, T val):
+        self.data[idx] = val
+
+    int len():
+        return self.count
+
+    bool contains(T val):
+        for i in range(0, self.count):
+            if self.data[i] == val:
+                return true
+        return false
+
+    void remove(int idx) throws:
+        if idx < 0 or idx >= self.count:
+            raise 1
+        if idx < self.count - 1:
+            for i in range(idx, self.count - 1):
+                self.data[i] = self.data[i + 1]
+        self.count -= 1
+
+    void uremove(int idx):
+        if idx < self.count - 1:
+            for i in range(idx, self.count - 1):
+                self.data[i] = self.data[i + 1]
+        self.count -= 1
+
+    void insert(int idx, T val) throws:
+        if idx < 0 or idx > self.count:
+            raise 1
+        if self.count >= self.capacity:
+            if self.capacity == 0:
+                self.capacity = 4
+            else:
+                self.capacity *= 2
+            self.data = (&T)realloc(self.data, self.capacity * sizeof(self.data[0]))
+        int i = self.count
+        for i > idx:
+            i = i - 1
+            self.data[i] = self.data[i - 1]
+        self.data[idx] = val
+        self.count += 1
+
+    void uinsert(int idx, T val):
+        if idx > self.count:
+            idx = self.count
+        if idx < 0:
+            idx = 0
+        if self.count >= self.capacity:
+            if self.capacity == 0:
+                self.capacity = 4
+            else:
+                self.capacity *= 2
+            self.data = (&T)realloc(self.data, self.capacity * sizeof(self.data[0]))
+        int i = self.count
+        for i > idx:
+            i = i - 1
+            self.data[i] = self.data[i - 1]
+        self.data[idx] = val
+        self.count += 1
+
+    void sort():
+        for i in range(0, self.count):
+            for j in range(0, self.count - i - 1):
+                if self.data[j + 1] < self.data[j]:
+                    T tmp = self.data[j]
+                    self.data[j] = self.data[j + 1]
+                    self.data[j + 1] = tmp
+
+    void destroy():
+        free(self.data)
+        self.data = (&T)0
+        self.count = 0
+        self.capacity = 0
+
+template<T>
+lists<T> make():
+    return lists<T>{data: (&T)0, count: 0, capacity: 0}

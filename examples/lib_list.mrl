@@ -1,0 +1,52 @@
+# Import and use the std list module — dynamic arrays with throws/catch
+@import "list/list"
+
+void demo_list():
+    lists<int> nums = make<int>()
+    nums.push(10)
+    nums.push(20)
+    nums.push(30)
+    nums.push(40)
+
+    print("len = ", nums.len(), "\n")
+
+    try:
+        print("nums[0] = ", nums.get(0), "\n")
+        print("nums[1] = ", nums.get(1), "\n")
+        print("nums[2] = ", nums.get(2), "\n")
+        print("nums[3] = ", nums.get(3), "\n")
+
+        nums.remove(1)
+        print("after remove(1): len = ", nums.len(), "\n")
+        print("nums[0] = ", nums.get(0), "\n")
+        print("nums[1] = ", nums.get(1), "\n")
+        print("nums[2] = ", nums.get(2), "\n")
+    catch 1:
+        print("catch in normal ops (unexpected)\n")
+    catch:
+        print("catch: unknown error\n")
+
+    if nums.contains(30):
+        print("contains 30: true\n")
+
+    int popped = nums.pop()
+    print("popped = ", popped, "\n")
+    print("after pop: len = ", nums.len(), "\n")
+
+    try:
+        int bogus = nums.get(999)
+    catch 1:
+        print("catch: out of bounds (expected)\n")
+    catch:
+        print("catch: unknown error\n")
+
+    try:
+        nums.remove(999)
+    catch 1:
+        print("catch: remove out of bounds (expected)\n")
+    catch:
+        print("catch: unknown error\n")
+
+    nums.destroy()
+
+demo_list()

@@ -1,0 +1,39 @@
+# Error handling -- throws/raise/try/catch
+
+int fault_flag = 2
+
+int read_byte() throws:
+    if fault_flag == 1:
+        raise 1
+    elif fault_flag == 2:
+        raise 2
+    return 0xAA
+
+void process() throws:
+    if fault_flag != 0:
+        raise -1
+
+void demo_errors():
+    # Try with specific catch + catch-all
+    try:
+        int byte = read_byte()
+        print("byte = ", byte, "\n")
+    catch 1:
+        print("not found\n")
+    catch 2:
+        print("timeout\n")
+    catch:
+        print("unknown error\n")
+
+    # Try with throws call
+    try:
+        process()
+    catch -1:
+        print("process failed\n")
+    catch:
+        print("other failure\n")
+
+fault_flag = 0
+
+fault_flag = 2
+demo_errors()

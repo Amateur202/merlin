@@ -1,0 +1,13 @@
+# Minimal Merlin demo -- top-level code, print() with all supported types
+
+print("Hello from Merlin!\n")
+
+int    answer = 42
+float  pi     = 3.14159
+bool   ok     = true
+char   nl     = '\n'
+
+print("answer = ", answer, "\n")
+print("pi     = ", pi, "\n")
+print("bool   = ", ok, "\n")
+print("char   = ", 'A', nl)

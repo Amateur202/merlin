@@ -1,0 +1,20 @@
+# Pattern matching -- match/case with catch-all and explicit fallthrough
+
+void handle_code(uint8 code):
+    match code:
+        case 0x00:
+            print("divide fault\n")
+        case 0x0A:
+            print("stack overflow\n")
+        case 0x0F:
+            print("timeout\n")
+        case:
+            print("generic error\n")
+
+void demo_match():
+    handle_code(0x00)
+    handle_code(0x0A)
+    handle_code(0x0F)
+    handle_code(0xFF)
+
+demo_match()

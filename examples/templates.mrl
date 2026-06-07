@@ -1,0 +1,32 @@
+# Templates/generics -- template struct, function, and method
+
+template<T>
+struct Box:
+    T value
+
+    void set(T v):
+        self.value = v
+
+    T get():
+        return self.value
+
+template<T>
+T identity(T x):
+    return x
+
+void demo_templates():
+    Box<int>  ibox = Box<int>{value: 42}
+    Box<float> fbox = Box<float>{value: 3.14}
+
+    int   iv = ibox.get()
+    float fv = fbox.get()
+
+    int   same_i = identity<int>(99)
+    float same_f = identity<float>(2.71)
+
+    print("ibox = ", iv, "\n")
+    print("fbox = ", fv, "\n")
+    print("id_i = ", same_i, "\n")
+    print("id_f = ", same_f, "\n")
+
+demo_templates()

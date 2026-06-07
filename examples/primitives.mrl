@@ -1,0 +1,66 @@
+# All primitive types, operators, casting, conversion, and numeric promotion
+
+void demo_primitives():
+    # Signed integers
+    int   a = -105
+    int8  b = -12
+    int16 c = 3000
+    int32 d = 500000
+    int64 e = 9000000000
+
+    # Unsigned integers
+    uint8  f = 255
+    uint16 g = 65535
+    uint32 h = 4294967295
+    uint64 i = 18446744073
+
+    # Floating point
+    float   j = 3.14159
+    float32 k = 1.234
+    float64 p = 2.71828
+
+    # Boolean
+    bool active = true
+    bool fault  = false
+
+    # Characters
+    char letter  = 'A'
+    char newline = '\n'
+    char next    = 'A' + 1
+
+    # Operators
+    int calc = (12 * 4) + (24 / 2) % 5
+    int shifted = 1 << 7 >> 2
+    if calc >= 10 and calc != 100:
+        calc = 0
+    int cfg = (calc & 0xFF) ^ 0xAA | 0x0F
+    if true or false and not active:
+        return
+
+    # Compound assignment
+    int acc = 10
+    acc += 2
+    acc -= 1
+    acc *= 5
+    acc /= 2
+    acc %= 3
+
+    # Casting
+    float  pi      = 3.14159
+    int    truncd  = (int)pi
+
+    # Conversion functions
+    string buf   = "8192"
+    int    port  = int(buf)
+
+    int    sid   = 65
+    string s1    = string(sid)
+    string s2    = string('M')
+
+    # Numeric promotion (implicit upward)
+    int8  small = 24
+    int32 large = 400000
+    int32 result = small + large
+    int8 forced = (int8)large
+
+demo_primitives()

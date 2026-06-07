@@ -1,0 +1,25 @@
+# Pointers -- reference, dereference, write-through, auto-deref, volatile
+
+struct Temp:
+    int level
+
+void demo_pointers():
+    int  value   = 777
+    &int ptr     = &value
+
+    int  read    = *ptr
+    *ptr         = 999
+
+    # Struct pointer with auto-dereference (dot notation, no ->)
+    Temp  block  = Temp{level: 45}
+    &Temp tptr   = &block
+    tptr.level   = 52
+
+    # Volatile pointer (hardware-mapped I/O — omit runtime write in userspace)
+    volatile &uint8 uart = (volatile &uint8)0x3F8
+
+    print("value = ", value, "\n")
+    print("read  = ", read, "\n")
+    print("level = ", block.level, "\n")
+
+demo_pointers()

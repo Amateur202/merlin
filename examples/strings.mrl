@@ -1,0 +1,24 @@
+# Strings -- dynamic strings, conversions, casts
+
+# Custom types (must be top-level)
+type Meter int
+type Feet  int
+
+void demo_strings():
+    string name       = "Merlin"
+    string path       = "/usr/local/merlin"
+    string short_str  = "ok"
+
+    # Conversion functions
+    string buf   = "8192"
+    int    port  = int(buf)
+
+    int    sid   = 65
+    string s1    = string(sid)
+    string s2    = string('M')
+
+    Meter distance = (Meter)1500
+    Feet  ceiling  = (Feet)distance
+    int   raw      = (int)distance
+
+demo_strings()

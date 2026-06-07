@@ -1,0 +1,262 @@
+@import "mem"
+
+# Entry layout (32 bytes each):
+#   [0-7]   char*     key_data
+#   [8-11]  int       key_length
+#   [12-15] int       key_capacity
+#   [16-23] intptr_t  value
+#   [24]    uint8_t   alive (1 = live entry, 0 = empty/tombstone)
+#   [25-31] padding
+
+struct HashMap:
+    &uint8 data
+    int count
+    int capacity
+
+int _hash(string s):
+    cblock:
+        uint32_t h = 2166136261u;
+        int i;
+        for (i = 0; i < s.length; i++) {
+            h ^= (uint8_t)s.data[i];
+            h *= 16777619u;
+        }
+        return (int)(h & 0x7fffffff);
+
+void _resize(&HashMap self, int new_cap):
+    cblock:
+        int old_cap = self->capacity;
+        uint8_t* old_data = self->data;
+        uint8_t* new_data = (uint8_t*)calloc(new_cap, 32);
+        self->data = new_data;
+        self->capacity = new_cap;
+        self->count = 0;
+        int i;
+        for (i = 0; i < old_cap; i++) {
+            uint8_t* old_slot = old_data + i * 32;
+            if (*(old_slot + 24)) {
+                MerlinString* ek = (MerlinString*)old_slot;
+                int start = _hash(*ek) % new_cap;
+                if (start < 0) start = -start;
+                int j;
+                for (j = 0; j < new_cap; j++) {
+                    int idx = (start + j) % new_cap;
+                    uint8_t* slot = new_data + idx * 32;
+                    if (!*(slot + 24)) {
+                        memcpy(slot, old_slot, 24);
+                        *(slot + 24) = 1;
+                        self->count++;
+                        break;
+                    }
+                }
+            }
+        }
+        free(old_data);
+
+HashMap new():
+    HashMap m
+    cblock:
+        m.data = (uint8_t*)calloc(16, 32);
+        m.count = 0;
+        m.capacity = 16;
+    return m
+
+# put: copies the key data. Caller's string remains valid.
+void put(&HashMap self, string key, int val):
+    cblock:
+        if (self->capacity == 0 || self->count * 10 >= self->capacity * 7) {
+            int nc = 16;
+            if (self->capacity > 0) nc = self->capacity * 2;
+            _resize(self, nc);
+        }
+        int cap = self->capacity;
+        int start = _hash(key) % cap;
+        if (start < 0) start = -start;
+        int first_dead = -1;
+        int i;
+        for (i = 0; i < cap; i++) {
+            int idx = (start + i) % cap;
+            uint8_t* slot = self->data + idx * 32;
+            if (!*(slot + 24)) {
+                if (first_dead == -1) first_dead = idx;
+                continue;
+            }
+            MerlinString* ek = (MerlinString*)slot;
+            if (ek->length == key.length && memcmp(ek->data, key.data, key.length) == 0) {
+                free(ek->data);
+                ek->data = (char*)malloc(key.length + 1);
+                memcpy(ek->data, key.data, key.length + 1);
+                *(intptr_t*)(slot + 16) = val;
+                return;
+            }
+        }
+        if (first_dead != -1) {
+            uint8_t* slot = self->data + first_dead * 32;
+            MerlinString* ek = (MerlinString*)slot;
+            ek->data = (char*)malloc(key.length + 1);
+            memcpy(ek->data, key.data, key.length + 1);
+            ek->length = key.length;
+            ek->capacity = key.length + 1;
+            *(intptr_t*)(slot + 16) = val;
+            *(slot + 24) = 1;
+            self->count++;
+        }
+
+# put_move: takes ownership of the key's data (zero-copy).
+# The caller must not use the key string afterward.
+void put_move(&HashMap self, string key, int val):
+    cblock:
+        if (self->capacity == 0 || self->count * 10 >= self->capacity * 7) {
+            int nc = 16;
+            if (self->capacity > 0) nc = self->capacity * 2;
+            _resize(self, nc);
+        }
+        int cap = self->capacity;
+        int start = _hash(key) % cap;
+        if (start < 0) start = -start;
+        int first_dead = -1;
+        int i;
+        for (i = 0; i < cap; i++) {
+            int idx = (start + i) % cap;
+            uint8_t* slot = self->data + idx * 32;
+            if (!*(slot + 24)) {
+                if (first_dead == -1) first_dead = idx;
+                continue;
+            }
+            MerlinString* ek = (MerlinString*)slot;
+            if (ek->length == key.length && memcmp(ek->data, key.data, key.length) == 0) {
+                free(ek->data);
+                ek->data = key.data;
+                ek->length = key.length;
+                ek->capacity = key.capacity;
+                *(intptr_t*)(slot + 16) = val;
+                return;
+            }
+        }
+        if (first_dead != -1) {
+            uint8_t* slot = self->data + first_dead * 32;
+            MerlinString* ek = (MerlinString*)slot;
+            ek->data = key.data;
+            ek->length = key.length;
+            ek->capacity = key.capacity;
+            *(intptr_t*)(slot + 16) = val;
+            *(slot + 24) = 1;
+            self->count++;
+        }
+
+bool contains(&HashMap self, string key):
+    bool found = false
+    cblock:
+        int cap = self->capacity;
+        if (cap > 0) {
+            int start = _hash(key) % cap;
+            if (start < 0) start = -start;
+            int i;
+            for (i = 0; i < cap; i++) {
+                int idx = (start + i) % cap;
+                uint8_t* slot = self->data + idx * 32;
+                if (!*(slot + 24)) continue;
+                MerlinString* ek = (MerlinString*)slot;
+                if (ek->length == key.length && memcmp(ek->data, key.data, key.length) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+    return found
+
+# try_get: returns true if found, writes value to &out.
+# Use this instead of get() when 0 is a valid stored value.
+bool try_get(&HashMap self, string key, &int out_val):
+    bool found = false
+    cblock:
+        int cap = self->capacity;
+        if (cap > 0) {
+            int start = _hash(key) % cap;
+            if (start < 0) start = -start;
+            int i;
+            for (i = 0; i < cap; i++) {
+                int idx = (start + i) % cap;
+                uint8_t* slot = self->data + idx * 32;
+                if (!*(slot + 24)) continue;
+                MerlinString* ek = (MerlinString*)slot;
+                if (ek->length == key.length && memcmp(ek->data, key.data, key.length) == 0) {
+                    *out_val = *(intptr_t*)(slot + 16);
+                    found = true;
+                    break;
+                }
+            }
+        }
+    return found
+
+# get: returns 0 if key not found. Use try_get to distinguish 0 from missing.
+int get(&HashMap self, string key):
+    int val = 0
+    cblock:
+        int cap = self->capacity;
+        if (cap > 0) {
+            int start = _hash(key) % cap;
+            if (start < 0) start = -start;
+            int i;
+            for (i = 0; i < cap; i++) {
+                int idx = (start + i) % cap;
+                uint8_t* slot = self->data + idx * 32;
+                if (!*(slot + 24)) continue;
+                MerlinString* ek = (MerlinString*)slot;
+                if (ek->length == key.length && memcmp(ek->data, key.data, key.length) == 0) {
+                    val = *(intptr_t*)(slot + 16);
+                    break;
+                }
+            }
+        }
+    return val
+
+bool delete(&HashMap self, string key):
+    bool ok = false
+    cblock:
+        int cap = self->capacity;
+        if (cap > 0) {
+            int start = _hash(key) % cap;
+            if (start < 0) start = -start;
+            int i;
+            for (i = 0; i < cap; i++) {
+                int idx = (start + i) % cap;
+                uint8_t* slot = self->data + idx * 32;
+                if (!*(slot + 24)) continue;
+                MerlinString* ek = (MerlinString*)slot;
+                if (ek->length == key.length && memcmp(ek->data, key.data, key.length) == 0) {
+                    free(ek->data);
+                    ek->data = 0;
+                    ek->length = 0;
+                    ek->capacity = 0;
+                    *(intptr_t*)(slot + 16) = 0;
+                    *(slot + 24) = 0;
+                    self->count--;
+                    ok = true;
+                    break;
+                }
+            }
+        }
+    return ok
+
+int size(&HashMap self):
+    return self.count
+
+void clear(&HashMap self):
+    cblock:
+        if (self->data) {
+            int i;
+            for (i = 0; i < self->capacity; i++) {
+                uint8_t* slot = self->data + i * 32;
+                if (*(slot + 24)) {
+                    free(((MerlinString*)slot)->data);
+                }
+            }
+            free(self->data);
+            self->data = 0;
+        }
+        self->count = 0;
+        self->capacity = 0;
+
+void destroy(&HashMap self):
+    clear(self)

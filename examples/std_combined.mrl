@@ -1,0 +1,51 @@
+# Combine all 3 std modules — build a list, compute stats, format strings
+@import "list/list"
+@import "math/math"
+@import "strings/strings"
+
+void demo_combined() throws:
+    # Build an int list for scores
+    lists<int> scores = make<int>()
+    scores.push(85)
+    scores.push(92)
+    scores.push(78)
+    scores.push(95)
+    scores.push(88)
+
+    print("scores count = ", scores.len(), "\n")
+
+    int sum = 0
+    int n = scores.len()
+    for i in range(0, n):
+        sum = sum + scores.get(i)
+
+    float mean = (float)sum / (float)n
+    print("sum  = ", sum, "\n")
+    print("mean = ", mean, "\n")
+
+    float deviation_sum = 0.0
+    for i in range(0, n):
+        float diff = (float)scores.get(i) - mean
+        deviation_sum = deviation_sum + pow(diff, 2.0)
+
+    float variance = deviation_sum / (float)n
+    float stdev = sqrt(variance)
+    print("variance = ", variance, "\n")
+    print("stdev    = ", stdev, "\n")
+
+    string label = upper("statistics report")
+    print("[", label, "]\n")
+
+    for i in range(0, n):
+        print("  score ", scores.get(i), "\n")
+
+    print("max score = ", scores.get(0), "\n")
+    scores.destroy()
+
+void run():
+    try:
+        demo_combined()
+    catch:
+        print("error in combined demo\n")
+
+run()

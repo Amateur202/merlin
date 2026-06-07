@@ -1,0 +1,33 @@
+# Merlin Standard Math Library
+# Implementation: Links to C's libm.so
+
+# --- Constants ---
+float PI = 3.14159265358979323846
+float E  = 2.71828182845904523536
+
+# --- Basic Arithmetic ---
+external float fabs(float x) link "m"
+external float sqrt(float x) link "m"
+external float pow(float x, float y) link "m"
+external float exp(float x) link "m"
+external float log(float x) link "m"
+external float log10(float x) link "m"
+
+# --- Trigonometry ---
+external float sin(float x) link "m"
+external float cos(float x) link "m"
+external float tan(float x) link "m"
+external float asin(float x) link "m"
+external float acos(float x) link "m"
+external float atan(float x) link "m"
+external float atan2(float y, float x) link "m"
+
+# --- Hyperbolic ---
+external float sinh(float x) link "m"
+external float cosh(float x) link "m"
+external float tanh(float x) link "m"
+
+# --- Rounding ---
+external float ceil(float x) link "m"
+external float floor(float x) link "m"
+external float round(float x) link "m"

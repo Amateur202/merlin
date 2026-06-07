@@ -1,0 +1,24 @@
+@import "hashmap/hashmap"
+
+void main():
+    HashMap map = new()
+    put(&map, "alice", 30)
+    put(&map, "bob", 25)
+    put(&map, "charlie", 35)
+    put(&map, "alice", 31)
+
+    print("size = ", size(&map), "\n")
+    print("alice = ", get(&map, "alice"), "\n")
+    print("bob = ", get(&map, "bob"), "\n")
+    print("charlie = ", get(&map, "charlie"), "\n")
+
+    print("contains bob: ", contains(&map, "bob"), "\n")
+    print("contains zoe: ", contains(&map, "zoe"), "\n")
+
+    bool ok = delete(&map, "bob")
+    print("delete bob: ", ok, ", size = ", size(&map), "\n")
+
+    print("contains bob after delete: ", contains(&map, "bob"), "\n")
+
+    destroy(&map)
+    print("done\n")

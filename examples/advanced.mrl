@@ -1,0 +1,89 @@
+# Advanced: templates with throws, match, pointers, type aliases
+@import "list/list"
+
+type ResultCode int
+
+template<T>
+struct SafeBox:
+    T value
+    bool valid
+
+    T get() throws:
+        if not self.valid:
+            raise 1
+        return self.value
+
+    void set(T v):
+        self.value = v
+        self.valid = true
+
+int check_range(int x) throws:
+    if x < 0:
+        raise 10
+    elif x > 100:
+        raise 20
+    return x * 2
+
+void demo_advanced():
+    # Template struct with throws
+    SafeBox<int> box = SafeBox<int>{value: 0, valid: false}
+    box.set(42)
+
+    try:
+        int v = box.get()
+        print("box.get() = ", v, "\n")
+    catch 1:
+        print("box was invalid\n")
+    catch:
+        print("unknown error\n")
+
+    try:
+        SafeBox<int> empty = SafeBox<int>{value: 0, valid: false}
+        int v = empty.get()
+        print("empty.get() should not reach here\n")
+    catch 1:
+        print("empty.get() correctly raised error 1\n")
+    catch:
+        print("empty.get() unknown error\n")
+
+    # Pointer demo with non-template struct
+    int raw_val = 777
+    &int ptr = &raw_val
+    *ptr = 999
+    print("raw_val after pointer write = ", raw_val, "\n")
+
+    # Match on error codes from throws
+    try:
+        int r = check_range(50)
+        print("check(50) = ", r, "\n")
+    catch 10:
+        print("too low\n")
+    catch 20:
+        print("too high\n")
+
+    try:
+        int r = check_range(-5)
+        print("check(-5) = ", r, "\n")
+    catch 10:
+        print("check(-5): too low\n")
+    catch 20:
+        print("check(-5): too high\n")
+
+    # Type alias
+    ResultCode status = (ResultCode)0
+    print("status = ", (int)status, "\n")
+
+    # List from import
+    lists<int> items = make<int>()
+    items.push(100)
+    items.push(200)
+    items.push(300)
+    try:
+        print("items[1] = ", items.get(1), "\n")
+    catch 1:
+        print("items out of bounds\n")
+    catch:
+        print("items unknown error\n")
+    items.destroy()
+
+demo_advanced()

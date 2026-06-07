@@ -1,0 +1,250 @@
+bool is_empty(string s):
+    if len(s) == 0:
+        return true
+    return false
+
+int index_of(string s, string sub):
+    int is_match = 0
+    if len(sub) == 0:
+        return 0
+    if len(sub) > len(s):
+        return -1
+    for i in range(0, len(s) - len(sub) + 1):
+        is_match = 1
+        for j in range(0, len(sub)):
+            int idx = i + j
+            if (char)s.data[idx] != (char)sub.data[j]:
+                is_match = 0
+                break
+        if is_match == 1:
+            return i
+    return -1
+
+bool contains(string s, string sub):
+    if index_of(s, sub) != -1:
+        return true
+    return false
+
+bool starts_with(string s, string sub):
+    if len(sub) > len(s):
+        return false
+    for i in range(0, len(sub)):
+        if (char)s.data[i] != (char)sub.data[i]:
+            return false
+    return true
+
+bool ends_with(string s, string sub):
+    if len(sub) > len(s):
+        return false
+    int offset = len(s) - len(sub)
+    for i in range(0, len(sub)):
+        int idx = offset + i
+        if (char)s.data[idx] != (char)sub.data[i]:
+            return false
+    return true
+
+string upper(string s):
+    string res = ""
+    int n = len(s)
+    cblock:
+        free(res.data);
+        res.data = malloc(n + 1);
+        res.data[n] = 0;
+        res.capacity = n + 1;
+    res.length = n
+    for i in range(0, n):
+        char c = (char)s.data[i]
+        if c >= 'a' and c <= 'z':
+            res.data[i] = (int)(char)(c - 32)
+        else:
+            res.data[i] = (int)c
+    return res
+
+string lower(string s):
+    string res = ""
+    int n = s.length
+    cblock:
+        free(res.data);
+        res.data = malloc(n + 1);
+        res.data[n] = 0;
+        res.capacity = n + 1;
+    res.length = n
+    for i in range(0, n):
+        char c = (char)s.data[i]
+        if c >= 'A' and c <= 'Z':
+            res.data[i] = (int)(char)(c + 32)
+        else:
+            res.data[i] = (int)c
+    return res
+
+string substring(string s, int start, int end):
+    if start < 0:
+        start = 0
+    if end > s.length:
+        end = s.length
+    if start >= end:
+        return ""
+    string res = ""
+    int n = end - start
+    cblock:
+        free(res.data);
+        res.data = malloc(n + 1);
+        res.data[n] = 0;
+        res.capacity = n + 1;
+    res.length = n
+    for i in range(0, n):
+        int idx = start + i
+        res.data[i] = (int)s.data[idx]
+    return res
+
+string reverse(string s):
+    string res = ""
+    int n = s.length
+    cblock:
+        free(res.data);
+        res.data = malloc(n + 1);
+        res.data[n] = 0;
+        res.capacity = n + 1;
+    res.length = n
+    for i in range(0, n):
+        int idx = n - 1 - i
+        res.data[i] = (int)s.data[idx]
+    return res
+
+string repeat(string s, int n):
+    if n <= 0:
+        return ""
+    int total_len = s.length * n
+    string res = ""
+    cblock:
+        free(res.data);
+        res.data = malloc(total_len + 1);
+        res.data[total_len] = 0;
+        res.capacity = total_len + 1;
+    res.length = total_len
+    int written = 0
+    for i in range(0, n):
+        for j in range(0, s.length):
+            res.data[written] = (int)s.data[j]
+            written = written + 1
+    return res
+
+int compare(string a, string b):
+    int len_a = a.length
+    int len_b = b.length
+    int min_len = len_a
+    if len_b < min_len:
+        min_len = len_b
+    for i in range(0, min_len):
+        if (char)a.data[i] < (char)b.data[i]:
+            return -1
+        if (char)a.data[i] > (char)b.data[i]:
+            return 1
+    if len_a < len_b:
+        return -1
+    if len_a > len_b:
+        return 1
+    return 0
+
+string capitalize(string s):
+    if s.length == 0:
+        return s
+    string res = ""
+    int n = s.length
+    cblock:
+        free(res.data);
+        res.data = malloc(n + 1);
+        memcpy(res.data, s.data, n);
+        res.data[n] = 0;
+        res.capacity = n + 1;
+    res.length = n
+    char c = (char)res.data[0]
+    if c >= 'a' and c <= 'z':
+        res.data[0] = (int)(char)(c - 32)
+    return res
+
+string uncapitalize(string s):
+    if s.length == 0:
+        return s
+    string res = ""
+    int n = s.length
+    cblock:
+        free(res.data);
+        res.data = malloc(n + 1);
+        memcpy(res.data, s.data, n);
+        res.data[n] = 0;
+        res.capacity = n + 1;
+    res.length = n
+    char c = (char)res.data[0]
+    if c >= 'A' and c <= 'Z':
+        res.data[0] = (int)(char)(c + 32)
+    return res
+
+string trim_left(string s):
+    int start = 0
+    for start < s.length and ((char)s.data[start] == ' ' or (char)s.data[start] == '\t' or (char)s.data[start] == '\n' or (char)s.data[start] == '\r'):
+        start = start + 1
+    return substring(s, start, s.length)
+
+string trim_right(string s):
+    int end = s.length
+    for end > 0:
+        int idx = end - 1
+        char c = (char)s.data[idx]
+        if c == ' ' or c == '\t' or c == '\n' or c == '\r':
+            end = end - 1
+        else:
+            break
+    return substring(s, 0, end)
+
+string trim(string s):
+    return trim_right(trim_left(s))
+
+string replace(string s, string old, string new):
+    if old.length == 0:
+        return s
+    int count = 0
+    int s_idx = 0
+    for s_idx < s.length:
+        int is_match = 1
+        if s_idx + old.length <= s.length:
+            for j in range(0, old.length):
+                if (char)s.data[s_idx + j] != (char)old.data[j]:
+                    is_match = 0
+                    break
+        else:
+            is_match = 0
+        if is_match == 1:
+            count = count + 1
+            s_idx = s_idx + old.length
+        else:
+            s_idx = s_idx + 1
+    int total_len = s.length + count * (new.length - old.length)
+    string res = ""
+    cblock:
+        free(res.data);
+        res.data = malloc(total_len + 1);
+        res.data[total_len] = 0;
+        res.capacity = total_len + 1;
+    res.length = total_len
+    s_idx = 0
+    int res_idx = 0
+    for s_idx < s.length:
+        int is_match = 1
+        if s_idx + old.length <= s.length:
+            for j in range(0, old.length):
+                if (char)s.data[s_idx + j] != (char)old.data[j]:
+                    is_match = 0
+                    break
+        else:
+            is_match = 0
+        if is_match == 1:
+            for j in range(0, new.length):
+                res.data[res_idx] = (int)new.data[j]
+                res_idx = res_idx + 1
+            s_idx = s_idx + old.length
+        else:
+            res.data[res_idx] = (int)s.data[s_idx]
+            res_idx = res_idx + 1
+            s_idx = s_idx + 1
+    return res

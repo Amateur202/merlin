@@ -1,0 +1,47 @@
+# Import and use the std str module — string utilities
+@import "strings/strings"
+
+void demo_str():
+    string msg = "  Hello, Merlin!  "
+
+    print("upper: [", upper(msg), "]\n")
+    print("lower: [", lower(msg), "]\n")
+    print("trim:  [", trim(msg), "]\n")
+
+    print("starts_with '  ': ", starts_with(msg, "  "), "\n")
+    print("ends_with '!  ':  ", ends_with(msg, "!  "), "\n")
+    print("contains 'rlin':  ", contains(msg, "rlin"), "\n")
+    print("index_of 'Merl':  ", index_of(msg, "Merl"), "\n")
+
+    string sub = substring(msg, 2, 9)
+    print("substring(2, 9): [", sub, "]\n")
+
+    string rev = reverse("abcdef")
+    print("reverse('abcdef'): ", rev, "\n")
+
+    string rep = repeat("ha", 3)
+    print("repeat('ha', 3): ", rep, "\n")
+
+    int cmp = compare("apple", "banana")
+    print("compare('apple', 'banana') = ", cmp, "\n")
+
+    cmp = compare("same", "same")
+    print("compare('same', 'same')    = ", cmp, "\n")
+
+    print("capitalize:   ", capitalize("hello"), "\n")
+    print("uncapitalize: ", uncapitalize("World"), "\n")
+
+    string r = replace("one one one", "one", "two")
+    print("replace: ", r, "\n")
+
+    string t = trim_left(msg)
+    string u = trim_right(msg)
+    print("trim_left:  [", t, "]\n")
+    print("trim_right: [", u, "]\n")
+
+    if is_empty(msg):
+        print("msg is empty\n")
+    else:
+        print("msg is not empty\n")
+
+demo_str()

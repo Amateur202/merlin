@@ -1,0 +1,14 @@
+# Raw C memory functions (from <stdlib.h> — always linked)
+external &void malloc(uint64 size)
+external &void calloc(uint64 count, uint64 size)
+external &void realloc(&void ptr, uint64 size)
+external void free(&void ptr)
+
+# Typed wrappers
+template<T>
+&T alloc(int n):
+    return (&T)malloc(n * sizeof(T))
+
+template<T>
+&T alloc_zero(int n):
+    return (&T)calloc(n, sizeof(T))
